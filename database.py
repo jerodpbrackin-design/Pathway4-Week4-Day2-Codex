@@ -1,10 +1,10 @@
 import psycopg2
 
 DB_CONFIG = {
-    "dbname": "logistics_db",
-    "user": "postgres",
-    "password": "yourpassword",
-    "host": "localhost",
+    "database": "db_jman",
+    "user": "jman",
+    "password": "jman_pass",
+    "host": "pathway-4.ca1yc8okmo57.us-east-1.rds.amazonaws.com",
     "port": "5432"
 }
 
