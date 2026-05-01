@@ -3,7 +3,7 @@ import uuid
 from database import init_db, get_connection
 
 app = Flask(__name__)
-init_db()
+# init_db()
 
 @app.route('/drivers', methods=['POST'])
 def create_driver():
