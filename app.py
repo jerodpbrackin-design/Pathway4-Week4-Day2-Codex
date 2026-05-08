@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
 import uuid
 from database import init_db, get_connection
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 init_db()
 
 @app.route('/drivers', methods=['POST'])
