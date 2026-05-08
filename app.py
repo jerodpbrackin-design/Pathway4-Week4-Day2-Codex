@@ -1,11 +1,21 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import uuid
 from database import init_db, get_connection
 from flask_cors import CORS
 
-app = Flask(__name__)
+
+app = Flask(
+    __name__,
+    static_folder='static',
+    template_folder='templates'
+)
+
 CORS(app)
 init_db()
+
+@app.route('/')
+def home():
+    return render_template('index.html')
 
 @app.route('/drivers', methods=['POST'])
 def create_driver():
@@ -262,4 +272,7 @@ def delete_package(package_id):
     conn.close()
 
     return jsonify({"message": "Deleted"})
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
