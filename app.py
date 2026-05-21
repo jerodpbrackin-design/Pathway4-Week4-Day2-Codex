@@ -1,8 +1,6 @@
 from flask import Flask, request, jsonify, render_template
-import uuid
 from database import init_db, get_connection
 from flask_cors import CORS
-
 
 app = Flask(
     __name__,
@@ -17,24 +15,32 @@ init_db()
 def home():
     return render_template('index.html')
 
+
+# =========================
+# DRIVERS
+# =========================
+
 @app.route('/drivers', methods=['POST'])
 def create_driver():
     data = request.json
-    driver_id = str(uuid.uuid4())
 
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO Drivers (DriverID, Name, LicenseType)
-        VALUES (%s, %s, %s)
-    """, (driver_id, data['name'], data['license_type']))
+        INSERT INTO Drivers (Name, LicenseType)
+        VALUES (%s, %s)
+        RETURNING DriverID
+    """, (data['name'], data['license_type']))
+
+    driver_id = cursor.fetchone()[0]
 
     conn.commit()
     cursor.close()
     conn.close()
 
     return jsonify({"DriverID": driver_id})
+
 
 @app.route('/drivers', methods=['GET'])
 def get_drivers():
@@ -47,7 +53,11 @@ def get_drivers():
     cursor.close()
     conn.close()
 
-    return jsonify(rows)
+    return jsonify([
+        {"DriverID": r[0], "Name": r[1], "LicenseType": r[2]}
+        for r in rows
+    ])
+
 
 @app.route('/drivers/<driver_id>', methods=['PUT'])
 def update_driver(driver_id):
@@ -68,6 +78,7 @@ def update_driver(driver_id):
 
     return jsonify({"message": "Updated"})
 
+
 @app.route('/drivers/<driver_id>', methods=['DELETE'])
 def delete_driver(driver_id):
     conn = get_connection()
@@ -81,24 +92,32 @@ def delete_driver(driver_id):
 
     return jsonify({"message": "Deleted"})
 
+
+# =========================
+# VEHICLES
+# =========================
+
 @app.route('/vehicles', methods=['POST'])
 def create_vehicle():
     data = request.json
-    vehicle_id = str(uuid.uuid4())
 
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO Vehicles (VehicleID, LicensePlate, Model, DriverID)
-        VALUES (%s, %s, %s, %s)
-    """, (vehicle_id, data['license_plate'], data['model'], data['driver_id']))
+        INSERT INTO Vehicles (LicensePlate, Model, DriverID)
+        VALUES (%s, %s, %s)
+        RETURNING VehicleID
+    """, (data['license_plate'], data['model'], data['driver_id']))
+
+    vehicle_id = cursor.fetchone()[0]
 
     conn.commit()
     cursor.close()
     conn.close()
 
     return jsonify({"VehicleID": vehicle_id})
+
 
 @app.route('/vehicles', methods=['GET'])
 def get_vehicles():
@@ -111,7 +130,11 @@ def get_vehicles():
     cursor.close()
     conn.close()
 
-    return jsonify(rows)
+    return jsonify([
+        {"VehicleID": r[0], "LicensePlate": r[1], "Model": r[2], "DriverID": r[3]}
+        for r in rows
+    ])
+
 
 @app.route('/vehicles/<vehicle_id>', methods=['PUT'])
 def update_vehicle(vehicle_id):
@@ -132,6 +155,7 @@ def update_vehicle(vehicle_id):
 
     return jsonify({"message": "Updated"})
 
+
 @app.route('/vehicles/<vehicle_id>', methods=['DELETE'])
 def delete_vehicle(vehicle_id):
     conn = get_connection()
@@ -145,24 +169,32 @@ def delete_vehicle(vehicle_id):
 
     return jsonify({"message": "Deleted"})
 
+
+# =========================
+# ROUTES
+# =========================
+
 @app.route('/routes', methods=['POST'])
 def create_route():
     data = request.json
-    route_id = str(uuid.uuid4())
 
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO Routes (RouteID, Date, ServiceZone, DriverID)
-        VALUES (%s, %s, %s, %s)
-    """, (route_id, data['date'], data['service_zone'], data['driver_id']))
+        INSERT INTO Routes (Date, ServiceZone, DriverID)
+        VALUES (%s, %s, %s)
+        RETURNING RouteID
+    """, (data['date'], data['service_zone'], data['driver_id']))
+
+    route_id = cursor.fetchone()[0]
 
     conn.commit()
     cursor.close()
     conn.close()
 
     return jsonify({"RouteID": route_id})
+
 
 @app.route('/routes', methods=['GET'])
 def get_routes():
@@ -175,7 +207,11 @@ def get_routes():
     cursor.close()
     conn.close()
 
-    return jsonify(rows)
+    return jsonify([
+        {"RouteID": r[0], "Date": r[1], "ServiceZone": r[2], "DriverID": r[3]}
+        for r in rows
+    ])
+
 
 @app.route('/routes/<route_id>', methods=['PUT'])
 def update_route(route_id):
@@ -196,6 +232,7 @@ def update_route(route_id):
 
     return jsonify({"message": "Updated"})
 
+
 @app.route('/routes/<route_id>', methods=['DELETE'])
 def delete_route(route_id):
     conn = get_connection()
@@ -209,24 +246,32 @@ def delete_route(route_id):
 
     return jsonify({"message": "Deleted"})
 
+
+# =========================
+# PACKAGES
+# =========================
+
 @app.route('/packages', methods=['POST'])
 def create_package():
     data = request.json
-    package_id = str(uuid.uuid4())
 
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO Packages (PackageID, Description, Weight, RouteID)
-        VALUES (%s, %s, %s, %s)
-    """, (package_id, data['description'], data['weight'], data['route_id']))
+        INSERT INTO Packages (Description, Weight, RouteID)
+        VALUES (%s, %s, %s)
+        RETURNING PackageID
+    """, (data['description'], data['weight'], data['route_id']))
+
+    package_id = cursor.fetchone()[0]
 
     conn.commit()
     cursor.close()
     conn.close()
 
     return jsonify({"PackageID": package_id})
+
 
 @app.route('/packages', methods=['GET'])
 def get_packages():
@@ -239,7 +284,11 @@ def get_packages():
     cursor.close()
     conn.close()
 
-    return jsonify(rows)
+    return jsonify([
+        {"PackageID": r[0], "Description": r[1], "Weight": r[2], "RouteID": r[3]}
+        for r in rows
+    ])
+
 
 @app.route('/packages/<package_id>', methods=['PUT'])
 def update_package(package_id):
@@ -260,6 +309,7 @@ def update_package(package_id):
 
     return jsonify({"message": "Updated"})
 
+
 @app.route('/packages/<package_id>', methods=['DELETE'])
 def delete_package(package_id):
     conn = get_connection()
@@ -273,6 +323,6 @@ def delete_package(package_id):
 
     return jsonify({"message": "Deleted"})
 
+
 if __name__ == '__main__':
     app.run(debug=True)
-

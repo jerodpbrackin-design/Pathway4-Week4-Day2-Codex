@@ -16,40 +16,52 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
 
+    # =========================
+    # DRIVERS
+    # =========================
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Drivers (
-        DriverID UUID PRIMARY KEY,
+        DriverID SERIAL PRIMARY KEY,
         Name VARCHAR(100) NOT NULL,
         LicenseType VARCHAR(25)
     );
     """)
 
+    # =========================
+    # VEHICLES
+    # =========================
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Vehicles (
-        VehicleID UUID PRIMARY KEY,
+        VehicleID SERIAL PRIMARY KEY,
         LicensePlate VARCHAR(10),
         Model VARCHAR(25),
-        DriverID UUID UNIQUE,
+        DriverID INT UNIQUE,
         FOREIGN KEY (DriverID) REFERENCES Drivers(DriverID)
     );
     """)
 
+    # =========================
+    # ROUTES
+    # =========================
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Routes (
-        RouteID UUID PRIMARY KEY,
+        RouteID SERIAL PRIMARY KEY,
         Date TIMESTAMP,
         ServiceZone VARCHAR(50),
-        DriverID UUID,
+        DriverID INT,
         FOREIGN KEY (DriverID) REFERENCES Drivers(DriverID)
     );
     """)
 
+    # =========================
+    # PACKAGES
+    # =========================
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Packages (
-        PackageID UUID PRIMARY KEY,
+        PackageID SERIAL PRIMARY KEY,
         Description VARCHAR(50) NOT NULL,
         Weight DECIMAL(10,2) NOT NULL,
-        RouteID UUID,
+        RouteID INT,
         FOREIGN KEY (RouteID) REFERENCES Routes(RouteID)
     );
     """)
