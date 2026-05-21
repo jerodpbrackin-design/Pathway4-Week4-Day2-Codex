@@ -145,9 +145,9 @@ def update_vehicle(vehicle_id):
 
     cursor.execute("""
         UPDATE Vehicles
-        SET LicensePlate = %s, Model = %s, DriverID = %s
-        WHERE VehicleID = %s
-    """, (data['license_plate'], data['model'], data['driver_id'], vehicle_id))
+            SET LicensePlate = %s, Model = %s, DriverID = %s
+            WHERE VehicleID = %s
+        """, (data['license_plate'], data['model'], data['driver_id'], vehicle_id))
 
     conn.commit()
     cursor.close()
